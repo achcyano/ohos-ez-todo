@@ -1,0 +1,10 @@
+{
+  "name": "entry",
+  "version": "1.0.0",
+  "description": "Useful toys built with OpenHarmony.",
+  "main": "",
+  "author": "AChCyano",
+  "license": "MIT License",
+  "dependencies": {}
+}
+
