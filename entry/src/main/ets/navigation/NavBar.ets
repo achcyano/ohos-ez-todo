@@ -95,21 +95,21 @@ struct MyNavigation {
         }
         Image(this.navItems[index].icon)
           .width(24)
-          .height(24)
+          . height(24)
           .fillColor(this.currentIndex === index ? '#1D1B20' : '#49454F')
       }
       .width(64)
       .height(32)
 
-      Text(this. navItems[index]. label)
-        . fontSize(12)
+      Text(this.navItems[index].label)
+        .fontSize(12)
         .fontWeight(this.currentIndex === index ? FontWeight.Medium : FontWeight.Normal)
         .fontColor(this.currentIndex === index ? '#1D1B20' : '#49454F')
         .margin({ top: 4 })
     }
     .width('100%')
     .height('100%')
-    .justifyContent(FlexAlign.Center)
+    .justifyContent(FlexAlign. Center)
     .onClick((): void => {
       this.currentIndex = index
     })
@@ -128,24 +128,43 @@ struct MyNavigation {
     if (this.isInSettings) {
       return "设置"
     }
-    return this. navItems[this. currentIndex].title
+    return this.navItems[this.currentIndex].title
   }
 
   @Builder
   NavigationMenus() {
-    if (this.currentIndex === 0 && ! this.isInSettings) {
-      Row() {
-        Image($r('app.media.filter'))
-          .width(24)
-          .height(24)
-          .fillColor(this.todoFilter.filterType !== 0 ? '#6750A4' : '#49454F')
+    Row() {
+      if (this.currentIndex === 0 && !this.isInSettings) {
+        Row() {
+          Image($r('app.media.filter'))
+            .width(24)
+            .height(24)
+            .fillColor(this.todoFilter.filterType !== 0 ? '#6750A4' : '#49454F')
+        }
+        .width(40)
+        .height(40)
+        .justifyContent(FlexAlign.Center)
+        .onClick((): void => {
+          this.showFilterDialog();
+        })
       }
-      .width(40)
-      .height(40)
-      .justifyContent(FlexAlign.Center)
-      .onClick((): void => {
-        this.showFilterDialog();
-      })
+
+      if (! this.isInSettings) {
+        Row() {
+          Image($r('app.media.setting'))
+            .width(24)
+            .height(24)
+            .fillColor('#49454F')
+        }
+        .width(40)
+        .height(40)
+        .justifyContent(FlexAlign.Center)
+        .margin({ left: 8 })
+        . onClick((): void => {
+          this. isInSettings = true
+          this.pageInfos.pushPath({ name: 'Settings' })
+        })
+      }
     }
   }
 
@@ -158,11 +177,11 @@ struct MyNavigation {
         .width('100%')
         .layoutWeight(1)
       }
-      . title(this.getCurrentTitle())
+      .title(this.getCurrentTitle())
       .titleMode(NavigationTitleMode. Full)
       .mode(NavigationMode. Stack)
       .navDestination(this.PageMap)
-      .hideToolBar(true)
+      . hideToolBar(true)
       . hideBackButton(! this.isInSettings)
       .menus(this.NavigationMenus())
       .onNavBarStateChange((isVisible: boolean): void => {
@@ -191,7 +210,7 @@ struct MyNavigation {
         offsetY: -2
       })
       .padding({ bottom: 12 })
-      .visibility(this.isInSettings ?  Visibility.None : Visibility. Visible)
+      .visibility(this.isInSettings ? Visibility. None : Visibility. Visible)
     }
     .height('100%')
     .width('100%')
