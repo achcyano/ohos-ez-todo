@@ -42,7 +42,7 @@ export struct SettingsPage {
 
           ListItem() {
             Row() {
-              Text('关于应用')
+              Text('关于')
                 . fontSize(16)
               Blank()
               Text('v1.0.0')

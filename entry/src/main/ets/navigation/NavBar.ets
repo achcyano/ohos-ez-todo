@@ -21,13 +21,13 @@ struct MyNavigation {
       name: "Todos",
       icon: $r('app.media.home'),
       label: "待办",
-      title: "待办事项"
+      title: "TODO"
     },
     {
       name: "About",
       icon: $r('app.media.info'),
       label: "关于",
-      title: "关于我们"
+      title: "关于"
     }
   ]
 
@@ -97,7 +97,7 @@ struct MyNavigation {
         .layoutWeight(1)
       }
       .title(this.getCurrentTitle())
-      .titleMode(NavigationTitleMode. Mini)
+      .titleMode(NavigationTitleMode.Full)
       .mode(NavigationMode. Stack)
       .navDestination(this.PageMap)
       . hideToolBar(true)
@@ -105,7 +105,7 @@ struct MyNavigation {
       .menus([
         {
           value: '',
-          icon: $r('app.media.setting'),
+          icon: 'resources/base/media/setting.svg',
           action: () => {
             this.isInSettings = true
             this.pageInfos.pushPath({ name: 'Settings' })
