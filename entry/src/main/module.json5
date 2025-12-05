@@ -44,6 +44,19 @@
             "resource": "$profile:backup_config"
           }
         ]
+      },
+      {
+        "name": "TodoFormAbility",
+        "srcEntry": "./ets/formability/TodoFormAbility.ets",
+        "label": "$string:TodoFormAbility_label",
+        "description": "$string:TodoFormAbility_desc",
+        "type": "form",
+        "metadata": [
+          {
+            "name": "ohos.extension.form",
+            "resource": "$profile:form_config"
+          }
+        ]
       }
     ]
   }

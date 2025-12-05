@@ -53,9 +53,7 @@ struct MyNavigation {
     }
   ]
 
-  onFilterChange(): void {
-    // 筛选状态变化时的回调
-  }
+  onFilterChange(): void {}
 
   showFilterDialog(): void {
     this.filterDialogController = new CustomDialogController({

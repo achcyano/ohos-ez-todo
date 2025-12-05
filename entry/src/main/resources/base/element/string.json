@@ -2,15 +2,31 @@
   "string": [
     {
       "name": "module_desc",
-      "value": "module description"
+      "value": "TODO Manager"
     },
     {
       "name": "EntryAbility_desc",
-      "value": "description"
+      "value": "TODO Manager Application"
     },
     {
       "name": "EntryAbility_label",
-      "value": "Ohos TODO"
+      "value": "TODO"
+    },
+    {
+      "name": "TodoFormAbility_label",
+      "value": "今日待办"
+    },
+    {
+      "name": "TodoFormAbility_desc",
+      "value": "显示今日待办事项的桌面卡片"
+    },
+    {
+      "name": "todo_card_display_name",
+      "value": "今日待办"
+    },
+    {
+      "name": "todo_card_description",
+      "value": "在桌面显示今日待办事项"
     }
   ]
 }
