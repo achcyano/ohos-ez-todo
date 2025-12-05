@@ -20,7 +20,7 @@ export struct TodosPage {
   private dialogController: CustomDialogController | null = null;
 
   aboutToAppear(): void {
-    this. initPreferences();
+    this.initPreferences();
   }
 
   async initPreferences(): Promise<void> {
@@ -31,13 +31,13 @@ export struct TodosPage {
 
   async loadTodoList(): Promise<void> {
     const list = await PreferenceUtil.getTodoList();
-    this. todoList = list;
+    this.todoList = list;
     this.updateFilteredLists();
   }
 
   updateFilteredLists(): void {
-    this.unfinishedList = this.todoList.filter((item: TodoItem) => !item.isFinished);
-    this.finishedList = this.todoList.filter((item: TodoItem) => item.isFinished);
+    this.unfinishedList = this.todoList. filter((item: TodoItem) => ! item.isFinished);
+    this. finishedList = this.todoList. filter((item: TodoItem) => item. isFinished);
   }
 
   showEditDialog(todo: TodoItem, isNew: boolean): void {
@@ -65,7 +65,7 @@ export struct TodosPage {
   }
 
   async handleToggleFinish(todo: TodoItem): Promise<void> {
-    await PreferenceUtil. updateTodo(todo);
+    await PreferenceUtil.updateTodo(todo);
     await this. loadTodoList();
   }
 
@@ -96,7 +96,7 @@ export struct TodosPage {
         Scroll() {
           Column() {
             // 未完成列表
-            if (this.unfinishedList.length > 0) {
+            if (this. unfinishedList.length > 0) {
               TodoSection({
                 title: '未完成',
                 todoList: $unfinishedList,
@@ -138,9 +138,9 @@ export struct TodosPage {
                   . height(120)
                   .opacity(0.5)
                 Text('暂无待办事项')
-                  .fontSize(16)
+                  . fontSize(16)
                   . fontColor('#9E9E9E')
-                  . margin({ top: 16 })
+                  .margin({ top: 16 })
                 Text('点击右下角按钮添加')
                   .fontSize(14)
                   .fontColor('#BDBDBD')
@@ -151,14 +151,19 @@ export struct TodosPage {
               .justifyContent(FlexAlign.Center)
             }
           }
-          .width('100%')
+          . width('100%')
+          .alignItems(HorizontalAlign.Start)
           .padding({ left: 16, right: 16, top: 16, bottom: 100 })
         }
         .width('100%')
-        .layoutWeight(1)
+        .height('100%')
+        .align(Alignment.Top)
+        .scrollBar(BarState.Off)
       }
       .width('100%')
-      .height('100%')
+      . height('100%')
+      .alignItems(HorizontalAlign.Start)
+      .justifyContent(FlexAlign.Start)
 
       // 悬浮添加按钮
       Button() {
@@ -168,23 +173,24 @@ export struct TodosPage {
           .fillColor('#FFFFFF')
       }
       .width(56)
-      .height(56)
+      . height(56)
       .backgroundColor('#6750A4')
       .borderRadius(16)
-      .shadow({
+      . shadow({
         radius: 8,
         color: '#406750A4',
         offsetX: 0,
         offsetY: 4
       })
       .position({ x: '100%', y: '100%' })
-      .translate({ x: -72, y: -72 })
-      . onClick((): void => {
-        this. handleAddTodo();
+      . translate({ x: -72, y: -72 })
+      .onClick((): void => {
+        this.handleAddTodo();
       })
     }
     .width('100%')
     .height('100%')
-    .backgroundColor('#F7F2FA')
+    .alignContent(Alignment.TopStart)
+    . backgroundColor('#F7F2FA')
   }
 }

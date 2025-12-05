@@ -8,7 +8,10 @@ export struct TodoCard {
   onDelete: (id: string) => void = (): void => {};
 
   @State offsetX: number = 0;
-  @State showDelete: boolean = false;
+
+  aboutToAppear(): void {
+    this. offsetX = 0;
+  }
 
   formatDate(timestamp: number): string {
     const date = new Date(timestamp);
@@ -21,31 +24,36 @@ export struct TodoCard {
     return ! this.todoItem. isFinished && this.todoItem.ddl < Date.now();
   }
 
+  resetOffset(): void {
+    this.offsetX = 0;
+  }
+
   build() {
     Stack() {
-      // 删除按钮背景
-      Row() {
-        Blank()
-        Column() {
-          Image($r('app.media.delete'))
-            .width(24)
-            .height(24)
-            .fillColor('#FFFFFF')
-          Text('删除')
-            .fontSize(12)
-            .fontColor('#FFFFFF')
-            . margin({ top: 4 })
+      if (this.offsetX < 0) {
+        Row() {
+          Blank()
+          Column() {
+            Image($r('app.media.delete'))
+              .width(24)
+              .height(24)
+              .fillColor('#FFFFFF')
+            Text('删除')
+              .fontSize(12)
+              .fontColor('#FFFFFF')
+              .margin({ top: 4 })
+          }
+          .width(80)
+          .height('100%')
+          .justifyContent(FlexAlign.Center)
+          .backgroundColor('#FF4444')
+          .onClick((): void => {
+            this.onDelete(this.todoItem.id);
+          })
         }
-        .width(80)
+        .width('100%')
         .height('100%')
-        .justifyContent(FlexAlign.Center)
-        .backgroundColor('#FF4444')
-        . onClick((): void => {
-          this.onDelete(this.todoItem.id);
-        })
       }
-      .width('100%')
-      .height('100%')
 
       // 卡片内容
       Row() {
@@ -58,7 +66,7 @@ export struct TodoCard {
                 .height(16)
                 .fillColor('#FFFFFF')
             }
-            . width(24)
+            .width(24)
             .height(24)
             .backgroundColor('#6750A4')
             .borderRadius(4)
@@ -66,8 +74,8 @@ export struct TodoCard {
           } else {
             Row()
               .width(24)
-              . height(24)
-              .border({ width: 2, color: '#6750A4' })
+              .height(24)
+              . border({ width: 2, color: '#6750A4' })
               .borderRadius(4)
           }
         }
@@ -76,7 +84,7 @@ export struct TodoCard {
         .justifyContent(FlexAlign.Center)
         .onClick((): void => {
           this.todoItem.isFinished = !this.todoItem.isFinished;
-          this. onToggleFinish(this.todoItem);
+          this.onToggleFinish(this. todoItem);
         })
 
         // 待办信息
@@ -90,7 +98,7 @@ export struct TodoCard {
             .textOverflow({ overflow: TextOverflow.Ellipsis })
 
           Row() {
-            Text(this.formatDate(this.todoItem.ddl))
+            Text(this.formatDate(this.todoItem. ddl))
               .fontSize(12)
               .fontColor(this.isOverdue() ? '#FF4444' : '#49454F')
 
@@ -121,25 +129,23 @@ export struct TodoCard {
           .onActionUpdate((event: GestureEvent): void => {
             if (event.offsetX < 0) {
               this.offsetX = Math.max(event.offsetX, -80);
-            } else {
-              this. offsetX = Math. min(event.offsetX, 0);
+            } else if (this.offsetX < 0) {
+              this.offsetX = Math.min(this.offsetX + event.offsetX, 0);
             }
           })
           . onActionEnd((): void => {
             if (this.offsetX < -40) {
               this.offsetX = -80;
-              this.showDelete = true;
             } else {
               this.offsetX = 0;
-              this.showDelete = false;
             }
           })
       )
-      .animation({ duration: 200, curve: Curve. EaseOut })
+      .animation({ duration: 200, curve: Curve.EaseOut })
     }
     .width('100%')
     . height(72)
-    .clip(true)
+    . clip(true)
     .borderRadius(12)
   }
 }
