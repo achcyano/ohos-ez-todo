@@ -59,7 +59,6 @@ export struct TodoFilterDialog {
         . fontWeight(FontWeight.Bold)
         .margin({ bottom: 20 })
 
-      // 筛选类型选择
       Column() {
         Text('筛选方式')
           . fontSize(14)
@@ -89,7 +88,6 @@ export struct TodoFilterDialog {
       .width('100%')
       .margin({ bottom: 16 })
 
-      // 按星期筛选
       if (this.filterType === 1) {
         Column() {
           Text('选择星期')
@@ -121,7 +119,6 @@ export struct TodoFilterDialog {
         . margin({ bottom: 16 })
       }
 
-      // 按日期区间筛选
       if (this. filterType === 2) {
         Column() {
           Text('开始日期')
@@ -178,7 +175,6 @@ export struct TodoFilterDialog {
         .margin({ bottom: 16 })
       }
 
-      // 按钮
       Row() {
         Button('取消')
           . fontSize(16)

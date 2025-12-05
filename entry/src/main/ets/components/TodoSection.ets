@@ -13,7 +13,6 @@ export struct TodoSection {
 
   build() {
     Column() {
-      // 标题栏
       Row() {
         Text(this.title)
           .fontSize(14)
@@ -40,7 +39,6 @@ export struct TodoSection {
         this.isExpanded = !this. isExpanded;
       })
 
-      // 列表内容
       if (this.isExpanded) {
         Column({ space: 12 }) {
           ForEach(this. todoList, (item: TodoItem) => {

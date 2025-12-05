@@ -85,7 +85,6 @@ export struct TodoEditDialog {
         .fontWeight(FontWeight.Bold)
         .margin({ bottom: 20 })
 
-      // 名称输入
       Column() {
         Text('待办名称')
           .fontSize(14)
@@ -104,7 +103,6 @@ export struct TodoEditDialog {
       .width('100%')
       .margin({ bottom: 16 })
 
-      // 截止日期
       Column() {
         Text('截止日期')
           .fontSize(14)
@@ -132,7 +130,6 @@ export struct TodoEditDialog {
       .width('100%')
       .margin({ bottom: 16 })
 
-      // 截止时间
       Column() {
         Text('截止时间')
           . fontSize(14)
@@ -160,7 +157,6 @@ export struct TodoEditDialog {
       .width('100%')
       . margin({ bottom: 16 })
 
-      // 是否提醒
       Row() {
         Text('开启提醒')
           .fontSize(16)
@@ -174,7 +170,6 @@ export struct TodoEditDialog {
       .width('100%')
       .height(48)
 
-      // 是否已完成
       Row() {
         Text('已完成')
           . fontSize(16)
@@ -189,7 +184,6 @@ export struct TodoEditDialog {
       .height(48)
       .margin({ bottom: 20 })
 
-      // 按钮
       Row() {
         Button('取消')
           . fontSize(16)

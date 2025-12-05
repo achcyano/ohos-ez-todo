@@ -24,7 +24,6 @@ struct TodayTodoCard {
 
   build() {
     Column() {
-      // 标题栏
       Row() {
         Column() {
           Text('今日待办')
@@ -70,7 +69,6 @@ struct TodayTodoCard {
           ForEach(this. todoList, (item: TodoItemData) => {
             ListItem() {
               Row() {
-                // 完成状态图标
                 if (item.isFinished) {
                   Row() {
                     Text('✓')
@@ -90,7 +88,6 @@ struct TodayTodoCard {
                     .borderRadius(4)
                 }
 
-                // 待办信息
                 Column() {
                   Text(item.name)
                     .fontSize(13)
@@ -115,7 +112,6 @@ struct TodayTodoCard {
               .padding({ left: 8, right: 8 })
             }
           }, (item: TodoItemData): string => {
-            // 使用 id + isFinished 作为 key，确保状态变化时重新渲染
             const finishedFlag = item.isFinished ? '1' : '0';
             return item.id + '_' + finishedFlag;
           })
