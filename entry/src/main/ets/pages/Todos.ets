@@ -58,7 +58,8 @@ export struct TodosPage {
         }
       }),
       alignment: DialogAlignment.Center,
-      customStyle: true
+      customStyle: true,
+      width: '30%',
     });
 
     this.dialogController.open();

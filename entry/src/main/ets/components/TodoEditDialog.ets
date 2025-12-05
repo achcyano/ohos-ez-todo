@@ -14,7 +14,7 @@ export struct TodoEditDialog {
   @State selectedDate: Date = new Date();
 
   aboutToAppear(): void {
-    this.tempName = this.todoItem.name;
+    this. tempName = this.todoItem.name;
     this. tempDdl = this.todoItem. ddl;
     this.tempIsFinished = this.todoItem.isFinished;
     this. tempNotice = this.todoItem.notice;
@@ -24,7 +24,7 @@ export struct TodoEditDialog {
   formatDate(timestamp: number): string {
     const date = new Date(timestamp);
     const year = date.getFullYear();
-    const month = (date. getMonth() + 1).toString().padStart(2, '0');
+    const month = (date.getMonth() + 1).toString().padStart(2, '0');
     const day = date.getDate().toString().padStart(2, '0');
     return `${year}-${month}-${day}`;
   }
@@ -32,11 +32,10 @@ export struct TodoEditDialog {
   build() {
     Column() {
       Text(this.isNewTodo ? '新建待办' : '编辑待办')
-        .fontSize(20)
+        . fontSize(20)
         .fontWeight(FontWeight. Bold)
         .margin({ bottom: 20 })
 
-      // 名称输入
       Column() {
         Text('待办名称')
           .fontSize(14)
@@ -63,19 +62,19 @@ export struct TodoEditDialog {
           .width('100%')
         Row() {
           Text(this.formatDate(this.tempDdl))
-            .fontSize(16)
+            . fontSize(16)
           Blank()
           Image($r('app.media.calendar'))
             .width(24)
             .height(24)
-            .fillColor('#49454F')
+            . fillColor('#49454F')
         }
         .width('100%')
         .height(44)
         .padding({ left: 12, right: 12 })
-        .margin({ top: 8 })
+        . margin({ top: 8 })
         .backgroundColor('#F5F5F5')
-        . borderRadius(8)
+        .borderRadius(8)
         .onClick((): void => {
           DatePickerDialog. show({
             start: new Date('2020-1-1'),
@@ -96,14 +95,14 @@ export struct TodoEditDialog {
         Text('开启提醒')
           .fontSize(16)
         Blank()
-        Toggle({ type: ToggleType.Switch, isOn: this. tempNotice })
-          .selectedColor('#6750A4')
-          . onChange((isOn: boolean): void => {
+        Toggle({ type: ToggleType.Switch, isOn: this.tempNotice })
+          . selectedColor('#6750A4')
+          .onChange((isOn: boolean): void => {
             this.tempNotice = isOn;
           })
       }
-      . width('100%')
-      .height(48)
+      .width('100%')
+      . height(48)
 
       // 是否已完成
       Row() {
@@ -116,19 +115,19 @@ export struct TodoEditDialog {
             this.tempIsFinished = isOn;
           })
       }
-      . width('100%')
+      .width('100%')
       .height(48)
-      . margin({ bottom: 20 })
+      .margin({ bottom: 20 })
 
       // 按钮
       Row() {
         Button('取消')
-          .fontSize(16)
+          . fontSize(16)
           .fontColor('#6750A4')
           . backgroundColor('#FFFFFF')
-          .border({ width: 1, color: '#6750A4' })
+          . border({ width: 1, color: '#6750A4' })
           .layoutWeight(1)
-          . height(44)
+          .height(44)
           .onClick((): void => {
             this.controller.close();
           })
@@ -139,7 +138,7 @@ export struct TodoEditDialog {
           . backgroundColor('#6750A4')
           . layoutWeight(1)
           .height(44)
-          . margin({ left: 12 })
+          .margin({ left: 12 })
           . onClick((): void => {
             const info: TodoItemInfo = {
               id: this.todoItem. id,
@@ -159,5 +158,6 @@ export struct TodoEditDialog {
     .padding(24)
     .backgroundColor('#FFFFFF')
     .borderRadius(16)
+    .margin({ left: 16, right: 16 })
   }
 }
