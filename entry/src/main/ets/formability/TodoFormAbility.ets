@@ -1,7 +1,8 @@
 import { FormExtensionAbility, formBindingData, formInfo, formProvider } from '@kit.FormKit';
 import { Want } from '@kit.AbilityKit';
-import { preferences } from '@kit.ArkData';
+import { fileIo } from '@kit.CoreFileKit';
 import { BusinessError } from '@kit.BasicServicesKit';
+import { buffer } from '@kit.ArkTS';
 
 interface TodoItemData {
   id: string;
@@ -9,6 +10,11 @@ interface TodoItemData {
   ddl: number;
   isFinished: boolean;
   notice: boolean;
+}
+
+interface StorageData {
+  todoList: TodoItemData[];
+  formIds: string[];
 }
 
 interface FormData {
@@ -19,44 +25,48 @@ interface FormData {
   dateText: string;
 }
 
+const FILE_NAME = 'todo_data.json';
+
 export default class TodoFormAbility extends FormExtensionAbility {
-  onAddForm(want: Want): formBindingData. FormBindingData {
-    const formId = this.getFormId(want);
-    console.info(`TodoFormAbility onAddForm, formId: ${formId}`);
+  onAddForm(want: Want): formBindingData.FormBindingData {
+    const formId = this. getFormId(want);
+    console.info('TodoFormAbility onAddForm: ' + formId);
+
+    this.saveFormId(formId);
 
     const formData = this.getTodayTodoData();
     return formBindingData.createFormBindingData(formData);
   }
 
   onCastToNormalForm(formId: string): void {
-    console. info(`TodoFormAbility onCastToNormalForm, formId: ${formId}`);
+    console. info('TodoFormAbility onCastToNormalForm: ' + formId);
   }
 
   onUpdateForm(formId: string): void {
-    console.info(`TodoFormAbility onUpdateForm, formId: ${formId}`);
+    console.info('TodoFormAbility onUpdateForm: ' + formId);
 
     const formData = this.getTodayTodoData();
     const bindingData = formBindingData.createFormBindingData(formData);
 
     formProvider.updateForm(formId, bindingData)
-      .then((): void => {
-        console.info('Update form success');
+      . then((): void => {
+        console. info('TodoFormAbility updateForm success');
       })
       .catch((err: BusinessError): void => {
-        console.error(`Failed to update form.  Code: ${err.code}, message: ${err.message}`);
+        console. error('TodoFormAbility updateForm failed: ' + err.message);
       });
   }
 
   onFormEvent(formId: string, message: string): void {
-    console.info(`TodoFormAbility onFormEvent, formId: ${formId}, message: ${message}`);
-
+    console.info('TodoFormAbility onFormEvent: ' + formId + ', ' + message);
     if (message === 'refresh') {
       this.onUpdateForm(formId);
     }
   }
 
   onRemoveForm(formId: string): void {
-    console.info(`TodoFormAbility onRemoveForm, formId: ${formId}`);
+    console.info('TodoFormAbility onRemoveForm: ' + formId);
+    this.removeFormId(formId);
   }
 
   onAcquireFormState(want: Want): formInfo.FormState {
@@ -68,79 +78,154 @@ export default class TodoFormAbility extends FormExtensionAbility {
       return '';
     }
     const wantParams: Record<string, Object> = want.parameters as Record<string, Object>;
-    const formIdValue: Object | undefined = wantParams[formInfo.FormParam.IDENTITY_KEY];
+    const formIdValue: Object | undefined = wantParams[formInfo.FormParam. IDENTITY_KEY];
     if (formIdValue === undefined) {
       return '';
     }
-    return formIdValue. toString();
+    return formIdValue.toString();
+  }
+
+  private getFilePath(): string {
+    const extensionContext = this.context;
+    return extensionContext.filesDir + '/' + FILE_NAME;
+  }
+
+  private readStorageData(): StorageData {
+    const defaultData: StorageData = { todoList: [], formIds: [] };
+    try {
+      const filePath = this.getFilePath();
+      let isExist = false;
+      try {
+        fileIo.accessSync(filePath);
+        isExist = true;
+      } catch (e) {
+        isExist = false;
+      }
+
+      if (!isExist) {
+        return defaultData;
+      }
+
+      const file = fileIo. openSync(filePath, fileIo. OpenMode.READ_ONLY);
+      const stat = fileIo.statSync(filePath);
+      const arrayBuffer = new ArrayBuffer(stat. size);
+      fileIo.readSync(file.fd, arrayBuffer);
+      fileIo.closeSync(file);
+
+      const uint8Array = new Uint8Array(arrayBuffer);
+      const content = buffer.from(uint8Array).toString('utf-8');
+      const data: StorageData = JSON. parse(content) as StorageData;
+      return data;
+    } catch (err) {
+      const error = err as BusinessError;
+      console.error('TodoFormAbility readStorageData failed: ' + error.message);
+      return defaultData;
+    }
+  }
+
+  private writeStorageData(data: StorageData): void {
+    try {
+      const filePath = this.getFilePath();
+      const content = JSON.stringify(data);
+      const buf = buffer.from(content, 'utf-8');
+      const uint8Array = new Uint8Array(buf.buffer);
+
+      const file = fileIo.openSync(filePath, fileIo.OpenMode.READ_WRITE | fileIo.OpenMode.CREATE | fileIo.OpenMode.TRUNC);
+      fileIo.writeSync(file.fd, uint8Array. buffer);
+      fileIo.closeSync(file);
+    } catch (err) {
+      const error = err as BusinessError;
+      console. error('TodoFormAbility writeStorageData failed: ' + error.message);
+    }
+  }
+
+  private saveFormId(formId: string): void {
+    if (formId === '') {
+      return;
+    }
+    const data = this.readStorageData();
+    let exists = false;
+    for (let i = 0; i < data.formIds.length; i++) {
+      if (data.formIds[i] === formId) {
+        exists = true;
+        break;
+      }
+    }
+    if (!exists) {
+      data. formIds.push(formId);
+      this.writeStorageData(data);
+      console.info('TodoFormAbility saveFormId: ' + formId);
+    }
+  }
+
+  private removeFormId(formId: string): void {
+    if (formId === '') {
+      return;
+    }
+    const data = this.readStorageData();
+    const newIds: string[] = [];
+    for (let i = 0; i < data.formIds.length; i++) {
+      if (data.formIds[i] !== formId) {
+        newIds.push(data.formIds[i]);
+      }
+    }
+    data.formIds = newIds;
+    this.writeStorageData(data);
+    console.info('TodoFormAbility removeFormId: ' + formId);
   }
 
   private getTodayTodoData(): FormData {
     const today = new Date();
-    const startOfDay = new Date(today.getFullYear(), today.getMonth(), today.getDate()). getTime();
+    const startOfDay = new Date(today.getFullYear(), today. getMonth(), today. getDate()).getTime();
     const endOfDay = startOfDay + 86400000 - 1;
 
     const month = today.getMonth() + 1;
     const day = today.getDate();
     const dateText: string = month. toString() + '月' + day.toString() + '日';
 
-    let todoList: TodoItemData[] = [];
+    const storageData = this.readStorageData();
+    const allTodos = storageData. todoList;
+
+    const filteredTodos: TodoItemData[] = [];
+    for (let i = 0; i < allTodos.length; i++) {
+      const item = allTodos[i];
+      if (item.ddl >= startOfDay && item.ddl <= endOfDay) {
+        filteredTodos.push(item);
+      }
+    }
+
+    filteredTodos.sort((a: TodoItemData, b: TodoItemData): number => {
+      if (a.isFinished !== b.isFinished) {
+        if (a.isFinished) {
+          return 1;
+        }
+        return -1;
+      }
+      return a.ddl - b.ddl;
+    });
+
     let finishedCount = 0;
-
-    try {
-      const context = this.context;
-      const options: preferences.Options = { name: 'todo_preferences' };
-      const store = preferences.getPreferencesSync(context, options);
-      const jsonStr = store.getSync('todo_list', '[]') as string;
-      const allTodos: TodoItemData[] = JSON.parse(jsonStr) as TodoItemData[];
-
-      // 筛选今日待办
-      const filteredTodos: TodoItemData[] = [];
-      for (let i = 0; i < allTodos.length; i++) {
-        const item: TodoItemData = allTodos[i];
-        if (item.ddl >= startOfDay && item. ddl <= endOfDay) {
-          filteredTodos. push(item);
-        }
+    for (let i = 0; i < filteredTodos. length; i++) {
+      if (filteredTodos[i].isFinished) {
+        finishedCount++;
       }
-      todoList = filteredTodos;
+    }
 
-      // 按完成状态和时间排序
-      todoList.sort((a: TodoItemData, b: TodoItemData): number => {
-        if (a.isFinished !== b.isFinished) {
-          if (a.isFinished) {
-            return 1;
-          } else {
-            return -1;
-          }
-        }
-        return a.ddl - b.ddl;
-      });
+    const totalCount = filteredTodos. length;
 
-      // 统计已完成数量
-      for (let i = 0; i < todoList.length; i++) {
-        if (todoList[i]. isFinished) {
-          finishedCount++;
-        }
+    let displayList: TodoItemData[] = filteredTodos;
+    if (filteredTodos.length > 5) {
+      displayList = [];
+      for (let i = 0; i < 5; i++) {
+        displayList.push(filteredTodos[i]);
       }
-
-      // 限制显示数量
-      if (todoList. length > 5) {
-        const limitedList: TodoItemData[] = [];
-        for (let i = 0; i < 5; i++) {
-          limitedList.push(todoList[i]);
-        }
-        todoList = limitedList;
-      }
-    } catch (err) {
-      const error = err as BusinessError;
-      console. error('Failed to get todo list: ' + error. message);
     }
 
     const result: FormData = {
-      todoList: todoList,
-      totalCount: todoList. length,
+      todoList: displayList,
+      totalCount: totalCount,
       finishedCount: finishedCount,
-      unfinishedCount: todoList. length - finishedCount,
+      unfinishedCount: totalCount - finishedCount,
       dateText: dateText
     };
 
