@@ -1,6 +1,7 @@
 import { AboutPage } from "../pages/About";
 import { TodosPage } from "../pages/Todos";
 import { SettingsPage } from "../pages/Settings";
+import { TodoFilterDialog } from "../components/TodoFilterDialog";
 
 interface NavItem {
   name: string;
@@ -9,12 +10,33 @@ interface NavItem {
   title: string;
 }
 
+interface FilterState {
+  filterType: number;
+  weekDays: boolean[];
+  startDate: number;
+  endDate: number;
+}
+
 @Entry
 @Component
 struct MyNavigation {
   @State currentIndex: number = 0
   @State isInSettings: boolean = false
+  @State filterState: FilterState = {
+    filterType: 0,
+    weekDays: [false, false, false, false, false, false, false],
+    startDate: 0,
+    endDate: 0
+  }
   @Provide('pageInfos') pageInfos: NavPathStack = new NavPathStack()
+  @Provide('todoFilter') @Watch('onFilterChange') todoFilter: FilterState = {
+    filterType: 0,
+    weekDays: [false, false, false, false, false, false, false],
+    startDate: 0,
+    endDate: 0
+  }
+
+  private filterDialogController: CustomDialogController | null = null;
 
   private navItems: NavItem[] = [
     {
@@ -30,6 +52,28 @@ struct MyNavigation {
       title: "关于"
     }
   ]
+
+  onFilterChange(): void {
+    // 筛选状态变化时的回调
+  }
+
+  showFilterDialog(): void {
+    this.filterDialogController = new CustomDialogController({
+      builder: TodoFilterDialog({
+        onConfirm: (filterType: number, weekDays: boolean[], startDate: number, endDate: number): void => {
+          this.todoFilter = {
+            filterType: filterType,
+            weekDays: weekDays,
+            startDate: startDate,
+            endDate: endDate
+          };
+        }
+      }),
+      alignment: DialogAlignment.Center,
+      customStyle: true
+    });
+    this.filterDialogController.open();
+  }
 
   @Builder
   PageMap(name: string) {
@@ -57,8 +101,8 @@ struct MyNavigation {
       .width(64)
       .height(32)
 
-      Text(this.navItems[index].label)
-        .fontSize(12)
+      Text(this. navItems[index]. label)
+        . fontSize(12)
         .fontWeight(this.currentIndex === index ? FontWeight.Medium : FontWeight.Normal)
         .fontColor(this.currentIndex === index ? '#1D1B20' : '#49454F')
         .margin({ top: 4 })
@@ -66,7 +110,7 @@ struct MyNavigation {
     .width('100%')
     .height('100%')
     .justifyContent(FlexAlign.Center)
-    .onClick(() => {
+    .onClick((): void => {
       this.currentIndex = index
     })
   }
@@ -84,7 +128,25 @@ struct MyNavigation {
     if (this.isInSettings) {
       return "设置"
     }
-    return this.navItems[this.currentIndex].title
+    return this. navItems[this. currentIndex].title
+  }
+
+  @Builder
+  NavigationMenus() {
+    if (this.currentIndex === 0 && ! this.isInSettings) {
+      Row() {
+        Image($r('app.media.filter'))
+          .width(24)
+          .height(24)
+          .fillColor(this.todoFilter.filterType !== 0 ? '#6750A4' : '#49454F')
+      }
+      .width(40)
+      .height(40)
+      .justifyContent(FlexAlign.Center)
+      .onClick((): void => {
+        this.showFilterDialog();
+      })
+    }
   }
 
   build() {
@@ -96,25 +158,16 @@ struct MyNavigation {
         .width('100%')
         .layoutWeight(1)
       }
-      .title(this.getCurrentTitle())
-      .titleMode(NavigationTitleMode.Full)
+      . title(this.getCurrentTitle())
+      .titleMode(NavigationTitleMode. Full)
       .mode(NavigationMode. Stack)
       .navDestination(this.PageMap)
-      . hideToolBar(true)
+      .hideToolBar(true)
       . hideBackButton(! this.isInSettings)
-      .menus([
-        {
-          value: '',
-          icon: 'resources/base/media/setting.svg',
-          action: () => {
-            this.isInSettings = true
-            this.pageInfos.pushPath({ name: 'Settings' })
-          }
-        }
-      ])
-      .onNavBarStateChange((isVisible: boolean) => {
+      .menus(this.NavigationMenus())
+      .onNavBarStateChange((isVisible: boolean): void => {
         if (isVisible) {
-          this.isInSettings = false
+          this. isInSettings = false
         }
       })
       .layoutWeight(1)
@@ -126,10 +179,10 @@ struct MyNavigation {
           }
           .layoutWeight(1)
           .height('100%')
-        }, (item: NavItem) => item.name)
+        }, (item: NavItem): string => item.name)
       }
       .width('100%')
-      . height(80)
+      .height(80)
       .backgroundColor('#FFFFFF')
       . shadow({
         radius: 8,
@@ -138,11 +191,11 @@ struct MyNavigation {
         offsetY: -2
       })
       .padding({ bottom: 12 })
-      .visibility(this.isInSettings ? Visibility. None : Visibility. Visible)
+      .visibility(this.isInSettings ?  Visibility.None : Visibility. Visible)
     }
     .height('100%')
     .width('100%')
-    .backgroundColor('#F7F2FA')
+    . backgroundColor('#F7F2FA')
   }
 }
 

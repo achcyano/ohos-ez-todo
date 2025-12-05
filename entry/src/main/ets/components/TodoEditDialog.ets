@@ -21,21 +21,71 @@ export struct TodoEditDialog {
     this. selectedDate = new Date(this.todoItem. ddl);
   }
 
-  formatDate(timestamp: number): string {
+  formatDateTime(timestamp: number): string {
     const date = new Date(timestamp);
     const year = date.getFullYear();
     const month = (date.getMonth() + 1).toString().padStart(2, '0');
     const day = date.getDate().toString().padStart(2, '0');
+    const hour = date.getHours(). toString().padStart(2, '0');
+    const minute = date.getMinutes().toString().padStart(2, '0');
+    return `${year}-${month}-${day} ${hour}:${minute}`;
+  }
+
+  formatDate(timestamp: number): string {
+    const date = new Date(timestamp);
+    const year = date.getFullYear();
+    const month = (date.getMonth() + 1).toString(). padStart(2, '0');
+    const day = date. getDate().toString(). padStart(2, '0');
     return `${year}-${month}-${day}`;
+  }
+
+  formatTime(timestamp: number): string {
+    const date = new Date(timestamp);
+    const hour = date. getHours().toString().padStart(2, '0');
+    const minute = date.getMinutes(). toString().padStart(2, '0');
+    return `${hour}:${minute}`;
+  }
+
+  showDatePicker(): void {
+    DatePickerDialog. show({
+      start: new Date('2020-1-1'),
+      end: new Date('2030-12-31'),
+      selected: this.selectedDate,
+      lunar: false,
+      onDateAccept: (value: Date): void => {
+        const newDate = new Date(this.selectedDate);
+        newDate.setFullYear(value.getFullYear());
+        newDate. setMonth(value. getMonth());
+        newDate.setDate(value.getDate());
+        this. selectedDate = newDate;
+        this.tempDdl = newDate.getTime();
+      }
+    });
+  }
+
+  showTimePicker(): void {
+    TimePickerDialog.show({
+      selected: this.selectedDate,
+      useMilitaryTime: true,
+      onAccept: (value: TimePickerResult): void => {
+        const newDate = new Date(this. selectedDate);
+        newDate.setHours(value.hour as number);
+        newDate. setMinutes(value.minute as number);
+        newDate.setSeconds(0);
+        this.selectedDate = newDate;
+        this.tempDdl = newDate.getTime();
+      }
+    });
   }
 
   build() {
     Column() {
       Text(this.isNewTodo ? '新建待办' : '编辑待办')
-        . fontSize(20)
-        .fontWeight(FontWeight. Bold)
+        .fontSize(20)
+        .fontWeight(FontWeight.Bold)
         .margin({ bottom: 20 })
 
+      // 名称输入
       Column() {
         Text('待办名称')
           .fontSize(14)
@@ -45,7 +95,7 @@ export struct TodoEditDialog {
           .width('100%')
           .height(44)
           .margin({ top: 8 })
-          . backgroundColor('#F5F5F5')
+          .backgroundColor('#F5F5F5')
           .borderRadius(8)
           .onChange((value: string): void => {
             this.tempName = value;
@@ -58,37 +108,57 @@ export struct TodoEditDialog {
       Column() {
         Text('截止日期')
           .fontSize(14)
-          .fontColor('#49454F')
-          .width('100%')
+          . fontColor('#49454F')
+          . width('100%')
         Row() {
           Text(this.formatDate(this.tempDdl))
-            . fontSize(16)
+            .fontSize(16)
           Blank()
           Image($r('app.media.calendar'))
             .width(24)
             .height(24)
-            . fillColor('#49454F')
+            .fillColor('#49454F')
         }
         .width('100%')
         .height(44)
         .padding({ left: 12, right: 12 })
-        . margin({ top: 8 })
+        .margin({ top: 8 })
         .backgroundColor('#F5F5F5')
-        .borderRadius(8)
+        . borderRadius(8)
         .onClick((): void => {
-          DatePickerDialog. show({
-            start: new Date('2020-1-1'),
-            end: new Date('2030-12-31'),
-            selected: this.selectedDate,
-            onDateAccept: (value: Date): void => {
-              this. selectedDate = value;
-              this.tempDdl = value.getTime();
-            }
-          })
+          this.showDatePicker();
         })
       }
       .width('100%')
       .margin({ bottom: 16 })
+
+      // 截止时间
+      Column() {
+        Text('截止时间')
+          . fontSize(14)
+          .fontColor('#49454F')
+          .width('100%')
+        Row() {
+          Text(this.formatTime(this.tempDdl))
+            .fontSize(16)
+          Blank()
+          Image($r('app.media.time'))
+            .width(24)
+            .height(24)
+            .fillColor('#49454F')
+        }
+        .width('100%')
+        .height(44)
+        .padding({ left: 12, right: 12 })
+        .margin({ top: 8 })
+        .backgroundColor('#F5F5F5')
+        . borderRadius(8)
+        .onClick((): void => {
+          this.showTimePicker();
+        })
+      }
+      .width('100%')
+      . margin({ bottom: 16 })
 
       // 是否提醒
       Row() {
@@ -96,22 +166,22 @@ export struct TodoEditDialog {
           .fontSize(16)
         Blank()
         Toggle({ type: ToggleType.Switch, isOn: this.tempNotice })
-          . selectedColor('#6750A4')
+          .selectedColor('#6750A4')
           .onChange((isOn: boolean): void => {
             this.tempNotice = isOn;
           })
       }
       .width('100%')
-      . height(48)
+      .height(48)
 
       // 是否已完成
       Row() {
         Text('已完成')
-          .fontSize(16)
+          . fontSize(16)
         Blank()
-        Toggle({ type: ToggleType.Switch, isOn: this. tempIsFinished })
+        Toggle({ type: ToggleType.Switch, isOn: this.tempIsFinished })
           .selectedColor('#6750A4')
-          .onChange((isOn: boolean): void => {
+          . onChange((isOn: boolean): void => {
             this.tempIsFinished = isOn;
           })
       }
@@ -158,6 +228,5 @@ export struct TodoEditDialog {
     .padding(24)
     .backgroundColor('#FFFFFF')
     .borderRadius(16)
-    .margin({ left: 16, right: 16 })
   }
 }
