@@ -4,12 +4,39 @@ import common from '@ohos.app.ability.common';
 const PREFERENCES_NAME = 'todo_preferences';
 const TODO_KEY = 'todo_list';
 
-export interface TodoItem {
+export interface TodoItemInfo {
   id: string;
   name: string;
   ddl: number;
   isFinished: boolean;
   notice: boolean;
+}
+
+@Observed
+export class TodoItem {
+  id: string;
+  name: string;
+  ddl: number;
+  isFinished: boolean;
+  notice: boolean;
+
+  constructor(info: TodoItemInfo) {
+    this. id = info.id;
+    this. name = info.name;
+    this. ddl = info. ddl;
+    this.isFinished = info.isFinished;
+    this.notice = info. notice;
+  }
+
+  toInfo(): TodoItemInfo {
+    return {
+      id: this. id,
+      name: this.name,
+      ddl: this.ddl,
+      isFinished: this.isFinished,
+      notice: this.notice
+    };
+  }
 }
 
 export class PreferenceUtil {
@@ -28,23 +55,25 @@ export class PreferenceUtil {
       return [];
     }
     try {
-      const jsonStr = await PreferenceUtil.preferences.get(TODO_KEY, '[]') as string;
-      return JSON.parse(jsonStr) as TodoItem[];
+      const jsonStr = await PreferenceUtil.preferences. get(TODO_KEY, '[]') as string;
+      const infoList: TodoItemInfo[] = JSON.parse(jsonStr) as TodoItemInfo[];
+      return infoList.map((info: TodoItemInfo) => new TodoItem(info));
     } catch (err) {
-      console.error('Failed to get todo list: ' + JSON.stringify(err));
+      console.error('Failed to get todo list: ' + JSON. stringify(err));
       return [];
     }
   }
 
   static async saveTodoList(todoList: TodoItem[]): Promise<void> {
-    if (!PreferenceUtil.preferences) {
+    if (! PreferenceUtil. preferences) {
       return;
     }
     try {
-      await PreferenceUtil. preferences.put(TODO_KEY, JSON.stringify(todoList));
+      const infoList: TodoItemInfo[] = todoList.map((item: TodoItem) => item.toInfo());
+      await PreferenceUtil.preferences.put(TODO_KEY, JSON.stringify(infoList));
       await PreferenceUtil. preferences.flush();
     } catch (err) {
-      console.error('Failed to save todo list: ' + JSON.stringify(err));
+      console.error('Failed to save todo list: ' + JSON. stringify(err));
     }
   }
 
@@ -56,10 +85,10 @@ export class PreferenceUtil {
 
   static async updateTodo(todo: TodoItem): Promise<void> {
     const todoList = await PreferenceUtil.getTodoList();
-    const index = todoList.findIndex((item: TodoItem) => item.id === todo. id);
+    const index = todoList.findIndex((item: TodoItem) => item.id === todo.id);
     if (index !== -1) {
       todoList[index] = todo;
-      await PreferenceUtil. saveTodoList(todoList);
+      await PreferenceUtil.saveTodoList(todoList);
     }
   }
 
